@@ -1,0 +1,31 @@
+#!/bin/bash
+
+---------------------------------------------------------
+
+# CREATING REPO, SNAPSHOT AND CRON JOB FOR SNAPSHOT
+
+# Run create-s3-snapshot-repo.sh with the appropriate params before adding the below to cronjob,
+# with appropriate params as well.
+
+# Run "crontab -e" in the terminal then paste the command below in cron jobs, asumming your
+# repository name which you created above is "s3-repo"
+
+# This runs every 12:00am, and dynamically gives the snapshot a name corresponding to the datetime
+# at which it ran. This is because, no two snapshot can have the same name. Check the backup.log
+# file to see if the snapshot went through
+
+
+# Backup index 'index-name' index every 12:00 am
+
+0 0 * * * echo -e "\n$(date)" >> ~/es-scripts/s3-backup/backup.log && ~/es-scripts/s3-backup/create-snapshot.sh -r "s3-repo" -s "$(./current-date-tolower.sh)" -i "index-name" >> ~/es-scripts/s3-backup/backup.log
+
+---------------------------------------------------------
+
+# CHECKING PROGRESS
+
+# Use check-snapshot-progress to monitor the snapshot progress, passing in appropriate params.
+# The -s option in the check-snapshot-progress.sh script will require a snapshot name which will
+# be the datetime which the snapshot was created. But you can not easily know this. So run
+# ./get-latest-name.sh passing in the repo name via the -r directive to see the last snapshot
+# taken (or currently running). When you have the snapshot name, then run check-snapshot-progress
+# with the appropriate params to see the progress
